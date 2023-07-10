@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:stepel/services/local_storage_service.dart';
 
 import 'welcome_card1.dart';
 import 'welcome_card2.dart';
@@ -69,7 +70,7 @@ class _WelcomePageState extends State<WelcomePage> {
                     child: ElevatedButton(
                       onPressed: () {
                         currentPageIndex == 3
-                            ? context.router.replaceNamed('/home')
+                            ? {LocalStorageService.instance.setFirstAppRun(false), context.router.replaceNamed('/home')}
                             : _pageController.nextPage(
                                 duration: const Duration(milliseconds: 300), curve: Curves.linear);
                       },
@@ -87,7 +88,8 @@ class _WelcomePageState extends State<WelcomePage> {
                           color: Colors.blueGrey,
                           decoration: TextDecoration.underline,
                         )),
-                    onPressed: () => context.router.replaceNamed('/home'))
+                    onPressed: () =>
+                        {LocalStorageService.instance.setFirstAppRun(false), context.router.replaceNamed('/home')})
               ],
             )));
   }
