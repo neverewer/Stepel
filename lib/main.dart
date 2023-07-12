@@ -5,6 +5,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var appRouter = AppRouter();
   await appRouter.init();
+  // await PedometrService.getInstance().init();
   runApp(MainApp(
     appRouter: appRouter,
   ));

@@ -1,7 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
+import 'package:stepel/blocks/home_page/home_page_cubit.dart';
+import 'package:stepel/blocks/home_page/home_page_state.dart';
 import 'package:stepel/widgets/bar_chart.dart';
 
 @RoutePage()
@@ -10,41 +13,51 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-        body: Padding(
-      padding: EdgeInsets.only(top: 30, right: 16, left: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          AppBar(),
-          SizedBox(
-            height: 25,
-          ),
-          Chart(),
-          SizedBox(
-            height: 20,
-          ),
-          ChartBottomLabel(),
-          SizedBox(
-            height: 30,
-          ),
-          StatisticLine(),
-          SizedBox(
-            height: 20,
-          ),
-          Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'ТЕНДЕНЦИИ',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-              )),
-          SizedBox(
-            height: 15,
-          ),
-          TrendsBox(),
-        ],
-      ),
-    ));
+    return BlocProvider(
+        create: (_) => HomePageCubit(),
+        child: BlocBuilder<HomePageCubit, HomePageState>(builder: (context, state) {
+          if (state is InitialHomePageState) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is LoadedHomePageState) {
+            return Scaffold(
+                body: Padding(
+              padding: const EdgeInsets.only(top: 30, right: 16, left: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const AppBar(),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Chart(steps: state.steps!),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const ChartBottomLabel(),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  const StatisticLine(),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'ТЕНДЕНЦИИ',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                      )),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  const TrendsBox(),
+                ],
+              ),
+            ));
+          } else {
+            return const SizedBox();
+          }
+        }));
   }
 }
 
@@ -137,7 +150,8 @@ class StatisticBox extends StatelessWidget {
 }
 
 class Chart extends StatelessWidget {
-  const Chart({super.key});
+  const Chart({super.key, required this.steps});
+  final int steps;
 
   @override
   Widget build(BuildContext context) {
@@ -162,34 +176,38 @@ class Chart extends StatelessWidget {
               },
             )),
         min: 0,
-        max: 8000,
-        initialValue: 1280,
+        max: 100,
+        initialValue: steps > 100 ? 100 : steps.toDouble(),
         innerWidget: (value) {
-          return const SizedBox();
+          return Center(child: Text(steps.toString()));
         },
       ),
       SleekCircularSlider(
-          appearance: CircularSliderAppearance(
-              size: 140,
-              startAngle: 270,
-              angleRange: 360,
-              customWidths: CustomSliderWidths(
-                progressBarWidth: 10,
-                trackWidth: 10,
-              ),
-              customColors: CustomSliderColors(
-                  trackColor: Colors.blue.withOpacity(0.2),
-                  progressBarColor: Colors.blue,
-                  shadowMaxOpacity: 0,
-                  dotColor: Colors.transparent),
-              infoProperties: InfoProperties(
-                modifier: (value) {
-                  return value.toStringAsFixed(0);
-                },
-              )),
-          min: 0,
-          max: 150,
-          initialValue: 17)
+        appearance: CircularSliderAppearance(
+            size: 140,
+            startAngle: 270,
+            angleRange: 360,
+            customWidths: CustomSliderWidths(
+              progressBarWidth: 10,
+              trackWidth: 10,
+            ),
+            customColors: CustomSliderColors(
+                trackColor: Colors.blue.withOpacity(0.2),
+                progressBarColor: Colors.blue,
+                shadowMaxOpacity: 0,
+                dotColor: Colors.transparent),
+            infoProperties: InfoProperties(
+              modifier: (value) {
+                return value.toStringAsFixed(0);
+              },
+            )),
+        min: 0,
+        max: 150,
+        initialValue: 17,
+        innerWidget: (value) {
+          return const SizedBox();
+        },
+      )
     ]);
   }
 }
