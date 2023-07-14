@@ -14,4 +14,6 @@ mixin LocalStorageCache {
 mixin LocalStorageApi on LocalStorageCache {
   Future<void> setFirstAppRun(bool firstAppRun) => _$db.then((db) => db.setBool('FIRSTAPPRUN', firstAppRun));
   Future<bool?> getFirstAppRun() => _$db.then((db) => db.getBool('FIRSTAPPRUN'));
+  Future<void> setCurrentSteps(int steps) => _$db.then((db) => db.setInt('CURRENTSTEPS', steps));
+  Future<int?> getCurrentSteps() => _$db.then((db) => db.getInt('CURRENTSTEPS'));
 }

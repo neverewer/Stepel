@@ -33,6 +33,13 @@ class _WeeklyBarChartState extends State<WeeklyBarChart> {
           leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
           bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: getTitles)),
         ),
+        barTouchData: BarTouchData(
+            enabled: true,
+            touchTooltipData: BarTouchTooltipData(
+              tooltipBgColor: Colors.white,
+              tooltipRoundedRadius: 20,
+              tooltipBorder: const BorderSide(width: 0.01, color: Colors.grey),
+            )),
         barGroups: widget.data
             .asMap()
             .entries

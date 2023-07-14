@@ -14,13 +14,19 @@ class HomePageCubit extends Cubit<HomePageState> {
   late StreamSubscription dataStreamSubscription;
 
   void init() async {
-    await pedometrService.init();
-    dataStreamSubscription = pedometrService.dataStream.stream.listen((event) => emit(LoadedHomePageState(
-        steps: event[0] as int, calories: (event[1] as double).toInt(), distance: event[2] as double)));
+    //await pedometrService.init();
+    dataStreamSubscription = pedometrService.dataStream.stream.listen((event) => emit((state as LoadedHomePageState)
+        .copyWith(
+            steps: event[0] as int,
+            calories: (event[1] as double).toInt(),
+            distance: event[2] as double,
+            cardioPoints: event[3] as int)));
     emit(LoadedHomePageState(
         steps: pedometrService.stepCount,
         calories: pedometrService.calories.toInt(),
         distance: pedometrService.distance,
-        stepsTarget: pedometrService.stepTarget));
+        stepsTarget: pedometrService.stepTarget,
+        cardioPoints: pedometrService.cardioPoints,
+        dayCardioPointsTarget: pedometrService.dayCardioPointsTarget));
   }
 }
