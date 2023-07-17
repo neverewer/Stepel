@@ -4,9 +4,9 @@ import 'package:stepel/services/pedometr_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await PedometrService.initServiceInBackground();
   var appRouter = AppRouter();
   await appRouter.init();
-  await PedometrService.getInstance().init();
   runApp(MainApp(
     appRouter: appRouter,
   ));
