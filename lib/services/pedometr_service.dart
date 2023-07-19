@@ -83,8 +83,6 @@ class PedometrService {
         await Permission.notification.request().isGranted;
   }
 
-  //Future<void> initServiceInForegraund() async {}
-
   static void initNotifications() {
     notificationPlugin.initialize(initSettings, onDidReceiveBackgroundNotificationResponse: (_) {});
   }
@@ -103,27 +101,44 @@ class PedometrService {
         : LocalStorageService.instance.setStepDate(stepDate.toIso8601String());
   }
 
-  static void setPreviousSteps(StepCount event) {
+  static void setPreviousSteps(StepCount event) async {
     if (preStepCount == 0) {
       preStepCount = event.steps;
-      LocalStorageService.instance.setCurrentSteps(preStepCount);
+      await LocalStorageService.instance.setCurrentSteps(preStepCount);
     }
   }
 
-  static void updatePreviousSteps(int preSteps) {
-    LocalStorageService.instance.setCurrentSteps(preSteps);
+  static void updatePreviousSteps(int preSteps) async {
+    try {
+      await LocalStorageService.instance.setCurrentSteps(preSteps);
+      preStepCount = preSteps;
+      notificationPlugin.show(2, 'Update previous steps', 'Previous steps was updated', notificationDetails);
+    } catch (e) {
+      notificationPlugin.show(
+          2, 'Update previous steps error', 'Previous steps wasnt updated, error : $e', notificationDetails);
+    }
   }
 
-  static void updateStepDate() {
-    stepDate = DateTime.now();
-    LocalStorageService.instance.setStepDate(stepDate.toIso8601String());
+  static void updateStepDate() async {
+    try {
+      stepDate = DateTime.now();
+      await LocalStorageService.instance.setStepDate(stepDate.toIso8601String());
+      notificationPlugin.show(2, 'Update step date', 'Step date was updated', notificationDetails);
+    } catch (e) {
+      notificationPlugin.show(2, 'Update step date error', 'Step date wasnt updated, error : $e', notificationDetails);
+    }
   }
 
   static void resetFitData() {
-    stepCount = 0;
-    calories = 0;
-    distance = 0;
-    cardioPoints = 0;
+    try {
+      stepCount = 0;
+      calories = 0;
+      distance = 0;
+      cardioPoints = 0;
+      notificationPlugin.show(1, 'New day', 'Fit data was reset, steps: $stepCount ', notificationDetails);
+    } catch (e) {
+      notificationPlugin.show(1, 'New day error', 'Fit data wasnt reset, error: $e', notificationDetails);
+    }
   }
 
   static void updateFitData(StepCount event) {

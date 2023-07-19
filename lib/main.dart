@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:stepel/router/router.dart';
 import 'package:stepel/services/pedometr_service.dart';
 
@@ -19,6 +20,9 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.white,
+    ));
     return MaterialApp.router(debugShowCheckedModeBanner: false, routerConfig: appRouter.config());
   }
 }

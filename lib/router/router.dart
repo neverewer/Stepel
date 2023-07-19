@@ -13,6 +13,11 @@ class AppRouter extends $AppRouter {
 
   @override
   List<AutoRoute> get routes => firstAppRun!
-      ? [AutoRoute(page: WelcomeRoute.page, path: '/'), AutoRoute(page: HomeRoute.page, path: '/home')]
-      : [AutoRoute(page: HomeRoute.page, path: '/')];
+      ? [
+          AutoRoute(page: WelcomeRoute.page, path: '/'),
+          AutoRoute(page: HomeRoute.page, path: '/home'),
+        ]
+      : [
+          AutoRoute(page: HomeRoute.page, path: '/'),
+        ];
 }
