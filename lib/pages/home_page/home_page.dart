@@ -19,13 +19,73 @@ class HomePage extends StatelessWidget {
     return BlocProvider(
         create: (_) => HomePageCubit(),
         child: BlocBuilder<HomePageCubit, HomePageState>(builder: (context, state) {
-          switch (state.runtimeType) {
-            case InitialHomePageState:
-              return const LoadingForm();
-            case LoadedHomePageState:
-              return HomePageForm(state: state as LoadedHomePageState);
-            default:
-              return const SizedBox();
+          if (state is InitialHomePageState) {
+            return const LoadingForm();
+          } else if (state is LoadedHomePageState) {
+            return Scaffold(
+                backgroundColor: Colors.white,
+                body: Padding(
+                    padding: const EdgeInsets.only(top: 30, right: 16, left: 16),
+                    child: SingleChildScrollView(
+                        padding: const EdgeInsets.only(bottom: 100),
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const AppBar(),
+                            const SizedBox(
+                              height: 30,
+                            ),
+                            Chart(
+                              steps: state.fitData.steps,
+                              cardioPoints: state.fitData.cardioPoints,
+                              stepsTarget: state.stepTarget,
+                              cardiPointsTarget: state.dayCardioPointsTarget,
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const ChartBottomLabel(),
+                            const SizedBox(
+                              height: 30,
+                            ),
+                            StatisticLine(
+                                calories: state.fitData.calories.toInt(),
+                                distance: state.fitData.moveDistance,
+                                moveTimeInMinutes: state.fitData.moveMinutes),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const CategoryLabel(text: 'ТЕНДЕНЦИИ'),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            TrendsBox(
+                              topLabel: 'Баллы кардиотренировок',
+                              value: state.fitData.cardioPoints,
+                            ),
+                            TrendsBox(
+                              topLabel: 'Шаги',
+                              value: state.fitData.steps,
+                              color: const Color.fromARGB(255, 2, 173, 102),
+                            ),
+                            TrendsBox(
+                              topLabel: 'Расход энергии',
+                              value: state.fitData.calories.toInt(),
+                              color: Colors.deepPurpleAccent,
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const CategoryLabel(text: 'РЕКОМЕНДАЦИИ'),
+                            const RecomendationBox(
+                                topLabel: 'Рекомендуемая \nпродолжительность сна',
+                                description:
+                                    'Узнайте, какие факторы влияют на сон и сколько нужно спать именно вам, чтобы высыпаться')
+                          ],
+                        ))));
+          } else {
+            return const SizedBox();
           }
         }));
   }
@@ -56,22 +116,132 @@ class HomePageForm extends StatelessWidget {
         backgroundColor: Colors.white,
         body: Padding(
             padding: const EdgeInsets.only(top: 30, right: 16, left: 16),
-            child: HomePageScrollView(child: HomePageFormBody(state: state))));
+            child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 100),
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const AppBar(),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    Chart(
+                      steps: state.fitData.steps,
+                      cardioPoints: state.fitData.cardioPoints,
+                      stepsTarget: state.stepTarget,
+                      cardiPointsTarget: state.dayCardioPointsTarget,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const ChartBottomLabel(),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    StatisticLine(
+                        calories: state.fitData.calories.toInt(),
+                        distance: state.fitData.moveDistance,
+                        moveTimeInMinutes: state.fitData.moveMinutes),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const CategoryLabel(text: 'ТЕНДЕНЦИИ'),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    TrendsBox(
+                      topLabel: 'Баллы кардиотренировок',
+                      value: state.fitData.cardioPoints,
+                    ),
+                    TrendsBox(
+                      topLabel: 'Шаги',
+                      value: state.fitData.steps,
+                      color: const Color.fromARGB(255, 2, 173, 102),
+                    ),
+                    TrendsBox(
+                      topLabel: 'Расход энергии',
+                      value: state.fitData.calories.toInt(),
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const CategoryLabel(text: 'РЕКОМЕНДАЦИИ'),
+                    const RecomendationBox(
+                        topLabel: 'Рекомендуемая \nпродолжительность сна',
+                        description:
+                            'Узнайте, какие факторы влияют на сон и сколько нужно спать именно вам, чтобы высыпаться')
+                  ],
+                ))));
   }
 }
 
-class HomePageScrollView extends StatelessWidget {
-  const HomePageScrollView({super.key, required this.child});
-  final Widget child;
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(bottom: 100),
-      physics: const BouncingScrollPhysics(),
-      child: child,
-    );
-  }
-}
+// class HomePageScrollView extends StatelessWidget {
+//   const HomePageScrollView({super.key, required this.child});
+//   final Widget child;
+//   @override
+//   Widget build(BuildContext context) {
+//     return SingleChildScrollView(
+//       padding: const EdgeInsets.only(bottom: 100),
+//       physics: const BouncingScrollPhysics(),
+//       child: Column(
+//       crossAxisAlignment: CrossAxisAlignment.center,
+//       children: [
+//         const AppBar(),
+//         const SizedBox(
+//           height: 30,
+//         ),
+//         Chart(
+//           steps: state.fitData!.steps,
+//           cardioPoints: state.fitData!.cardioPoints,
+//           stepsTarget: state.stepTarget!,
+//           cardiPointsTarget: state.dayCardioPointsTarget!,
+//         ),
+//         const SizedBox(
+//           height: 20,
+//         ),
+//         const ChartBottomLabel(),
+//         const SizedBox(
+//           height: 30,
+//         ),
+//         StatisticLine(
+//             calories: state.fitData!.calories.toInt(),
+//             distance: state.fitData!.moveDistance,
+//             moveTimeInMinutes: state.fitData!.moveMinutes),
+//         const SizedBox(
+//           height: 20,
+//         ),
+//         const CategoryLabel(text: 'ТЕНДЕНЦИИ'),
+//         const SizedBox(
+//           height: 5,
+//         ),
+//         TrendsBox(
+//           topLabel: 'Баллы кардиотренировок',
+//           value: state.fitData!.cardioPoints,
+//         ),
+//         TrendsBox(
+//           topLabel: 'Шаги',
+//           value: state.fitData!.steps,
+//           color: const Color.fromARGB(255, 2, 173, 102),
+//         ),
+//         TrendsBox(
+//           topLabel: 'Расход энергии',
+//           value: state.fitData!.calories.toInt(),
+//           color: Colors.deepPurpleAccent,
+//         ),
+//         const SizedBox(
+//           height: 20,
+//         ),
+//         const CategoryLabel(text: 'РЕКОМЕНДАЦИИ'),
+//         const RecomendationBox(
+//             topLabel: 'Рекомендуемая \nпродолжительность сна',
+//             description: 'Узнайте, какие факторы влияют на сон и сколько нужно спать именно вам, чтобы высыпаться')
+//       ],
+//     );,
+//     );
+//   }
+// }
 
 class HomePageFormBody extends StatelessWidget {
   const HomePageFormBody({super.key, required this.state});
@@ -87,10 +257,10 @@ class HomePageFormBody extends StatelessWidget {
           height: 30,
         ),
         Chart(
-          steps: state.steps!,
-          cardioPoints: state.cardioPoints!,
-          stepsTarget: state.stepsTarget!,
-          cardiPointsTarget: state.dayCardioPointsTarget!,
+          steps: state.fitData.steps,
+          cardioPoints: state.fitData.cardioPoints,
+          stepsTarget: state.stepTarget,
+          cardiPointsTarget: state.dayCardioPointsTarget,
         ),
         const SizedBox(
           height: 20,
@@ -99,7 +269,10 @@ class HomePageFormBody extends StatelessWidget {
         const SizedBox(
           height: 30,
         ),
-        StatisticLine(calories: state.calories!, distance: state.distance!, moveTimeInMinutes: 10),
+        StatisticLine(
+            calories: state.fitData.calories.toInt(),
+            distance: state.fitData.moveDistance,
+            moveTimeInMinutes: state.fitData.moveMinutes),
         const SizedBox(
           height: 20,
         ),
@@ -109,16 +282,16 @@ class HomePageFormBody extends StatelessWidget {
         ),
         TrendsBox(
           topLabel: 'Баллы кардиотренировок',
-          value: state.cardioPoints!,
+          value: state.fitData.cardioPoints,
         ),
         TrendsBox(
           topLabel: 'Шаги',
-          value: state.steps!,
+          value: state.fitData.steps,
           color: const Color.fromARGB(255, 2, 173, 102),
         ),
         TrendsBox(
           topLabel: 'Расход энергии',
-          value: state.calories!,
+          value: state.fitData.calories.toInt(),
           color: Colors.deepPurpleAccent,
         ),
         const SizedBox(

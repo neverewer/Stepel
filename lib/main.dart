@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:stepel/router/router.dart';
-import 'package:stepel/services/pedometr_service.dart';
+// import 'package:stepel/services/pedometr_service.dart';
+import 'package:stepel/services/pedometr_service/pedometr_service_background.dart';
+import 'package:stepel/services/pedometr_service/pedometr_service_foreground.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await PedometrService.initServiceInBackground();
+  PedometrServiceBackground.init();
+  await PedometrServiceForeground().init();
   var appRouter = AppRouter();
   await appRouter.init();
   runApp(MainApp(

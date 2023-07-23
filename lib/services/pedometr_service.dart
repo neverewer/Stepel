@@ -2,9 +2,13 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/intl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:stepel/services/local_storage_service.dart';
+
+import '../db/database.dart';
+import '../models/fit_data.dart';
 
 class PedometrService {
   static PedometrService? instance;
@@ -32,50 +36,64 @@ class PedometrService {
   static InitializationSettings initSettings = InitializationSettings(android: androidInitSettings, iOS: iosSettings);
   static NotificationDetails notificationDetails = NotificationDetails(android: androidNotificationDetails);
 
-  static DateTime stepDate = DateTime.now();
-  static int stepCount = 0;
-  static double distance = 0.0;
-  static double calories = 0.0;
-  static int cardioPoints = 0;
+  static String currentDateString = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  static DateTime currentDate = DateTime.parse(currentDateString);
   static int dayCardioPointsTarget = 40;
-  int walkingTimeInSeconds = 0;
   static int preStepCount = 0;
   static int stepTarget = 8000;
+  static final AppDb _db = AppDb();
+  // static final FitData _fitData = FitData();
 
-  static Stream<List<Object>> get fitDataStream => Pedometer.stepCountStream.asBroadcastStream().map((event) {
-        var steps = event.steps - preStepCount;
-        var calories = steps * 0.04;
-        var distance = steps * 0.0007;
-        var cardioPoints = (steps * 0.005).toInt();
-        return [steps, calories, distance, cardioPoints];
-      });
+  // static Stream<FitData> get fitDataStream =>
+  //     Pedometer.stepCountStream.asBroadcastStream().map((event) => _fitData..updateSteps(event.steps - preStepCount));
 
   static Future<void> initServiceInBackground() async {
-    if (await checkPermissions()) {
-      await getPreviousSteps();
-      await getStepDate();
-      configureBackgroundService();
+    if (await checkPermissions() == false) {
+      return;
     }
+    await getPreviousSteps();
+    await getStepDate();
+    configureBackgroundService();
   }
 
   static void configureBackgroundService() async {
     final service = FlutterBackgroundService();
-    if (await service.isRunning() == false) {
-      await service.configure(
-          androidConfiguration: AndroidConfiguration(
-            onStart: onStart,
-            autoStart: true,
-            isForegroundMode: true,
-            autoStartOnBoot: true,
-          ),
-          iosConfiguration: IosConfiguration());
+    if (await service.isRunning()) {
+      return;
     }
+    await service.configure(
+        androidConfiguration: AndroidConfiguration(
+          onStart: onStart,
+          autoStart: true,
+          isForegroundMode: true,
+          autoStartOnBoot: true,
+        ),
+        iosConfiguration: IosConfiguration());
   }
 
   @pragma('vm:entry-point')
   static Future<void> onStart(ServiceInstance service) async {
     DartPluginRegistrant.ensureInitialized();
+    await getPreviousSteps();
+    await getStepDate();
+    //getAllSteps();
     Pedometer.stepCountStream.listen(onStepCount).onError(onStepCountError);
+  }
+
+  // static void getSteps() async {
+  //   var a = await db.getStepsByDate(currentDate);
+  //   print(a.steps);
+  // }
+
+  static void getAllSteps() async {
+    var b = await _db.getAllSteps();
+    for (int i = 0; i < b.length; i++) {
+      print(b[i]);
+    }
+  }
+
+  static void deleteAllSteps() {
+    _db.deleteAllData();
   }
 
   static Future<bool> checkPermissions() async {
@@ -87,102 +105,62 @@ class PedometrService {
     notificationPlugin.initialize(initSettings, onDidReceiveBackgroundNotificationResponse: (_) {});
   }
 
+  // static FitData getFitData() => _fitData;
+
   static Future<void> getPreviousSteps() async {
-    var preSteps = (await LocalStorageService.instance.getCurrentSteps());
-    if (preSteps != null) {
-      preStepCount = preSteps;
+    var preSteps = await LocalStorageService.instance.getCurrentSteps();
+    if (preSteps == null) {
+      return;
     }
+    preStepCount = preSteps;
   }
 
   static Future<void> getStepDate() async {
     var date = await LocalStorageService.instance.getStepDate();
     date != null
-        ? stepDate = DateTime.parse(date)
-        : LocalStorageService.instance.setStepDate(stepDate.toIso8601String());
+        ? currentDate = DateTime.parse(date)
+        : LocalStorageService.instance.setStepDate(currentDate.toIso8601String());
   }
 
   static void setPreviousSteps(StepCount event) async {
-    if (preStepCount == 0) {
-      preStepCount = event.steps;
-      await LocalStorageService.instance.setCurrentSteps(preStepCount);
+    if (preStepCount != 0) {
+      return;
     }
+    preStepCount = event.steps;
+    LocalStorageService.instance.setCurrentSteps(preStepCount);
   }
 
   static void updatePreviousSteps(int preSteps) async {
-    try {
-      await LocalStorageService.instance.setCurrentSteps(preSteps);
-      preStepCount = preSteps;
-      notificationPlugin.show(2, 'Update previous steps', 'Previous steps was updated', notificationDetails);
-    } catch (e) {
-      notificationPlugin.show(
-          2, 'Update previous steps error', 'Previous steps wasnt updated, error : $e', notificationDetails);
-    }
+    LocalStorageService.instance.setCurrentSteps(preSteps);
+    preStepCount = preSteps;
   }
 
   static void updateStepDate() async {
-    try {
-      stepDate = DateTime.now();
-      await LocalStorageService.instance.setStepDate(stepDate.toIso8601String());
-      notificationPlugin.show(2, 'Update step date', 'Step date was updated', notificationDetails);
-    } catch (e) {
-      notificationPlugin.show(2, 'Update step date error', 'Step date wasnt updated, error : $e', notificationDetails);
-    }
+    currentDate = DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now()));
+    LocalStorageService.instance.setStepDate(currentDate.toIso8601String());
   }
 
-  static void resetFitData() {
-    try {
-      stepCount = 0;
-      calories = 0;
-      distance = 0;
-      cardioPoints = 0;
-      notificationPlugin.show(1, 'New day', 'Fit data was reset, steps: $stepCount ', notificationDetails);
-    } catch (e) {
-      notificationPlugin.show(1, 'New day error', 'Fit data wasnt reset, error: $e', notificationDetails);
-    }
-  }
-
-  static void updateFitData(StepCount event) {
-    stepCount = event.steps - preStepCount;
-    calories = stepCount * 0.04;
-    distance = stepCount * 0.0007;
-    cardioPoints = (stepCount * 0.005).toInt();
-  }
+  static void updateFitData(StepCount event) async =>
+      await _db.createOrUpdateSteps(Step(date: currentDate, steps: event.steps - preStepCount));
 
   static void onStepCount(StepCount event) {
     setPreviousSteps(event);
-    if (event.timeStamp.day == stepDate.day) {
+    if (event.timeStamp.day == currentDate.day) {
       updateFitData(event);
     } else {
       updateStepDate();
       updatePreviousSteps(event.steps);
-      resetFitData();
     }
-    showFitNotification();
+    // showFitNotification();
   }
 
   static void onStepCountError(error) {}
 
-  static void showFitNotification() {
-    notificationPlugin.show(
-        0,
-        'Statistic',
-        'steps: $stepCount, calories: ${calories.toInt()}, distance: ${distance.toStringAsFixed(1)} km,  cardio: $cardioPoints',
-        notificationDetails);
-  }
+  // static void showFitNotification() {
+  //   notificationPlugin.show(
+  //       0,
+  //       'Statistic',
+  //       'steps: $stepCount, calories: ${calories.toInt()}, distance: ${distance.toStringAsFixed(1)} km,  cardio: $cardioPoints',
+  //       notificationDetails);
+  // }
 }
-
-
-      // notificationPlugin
-      //     .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-      //     ?.requestPermission();
-      // DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
-      //   requestCriticalPermission: true,
-      //   onDidReceiveLocalNotification: (id, title, body, payload) {},
-      // );
-      // AndroidInitializationSettings androidInitSettings = const AndroidInitializationSettings('flutter_logo');
-      // InitializationSettings initSettings = InitializationSettings(android: androidInitSettings, iOS: iosSettings);
-      // notificationPlugin.initialize(initSettings,
-      //     onDidReceiveBackgroundNotificationResponse: (NotificationResponse response) {});
-      // NotificationDetails notificationDetails = NotificationDetails(android: androidNotificationDetails);
-      // notificationPlugin.show(0, 'event', step.steps.toString(), notificationDetails);
-      
