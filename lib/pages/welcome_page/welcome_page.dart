@@ -70,7 +70,10 @@ class _WelcomePageState extends State<WelcomePage> {
                     child: ElevatedButton(
                       onPressed: () {
                         currentPageIndex == 3
-                            ? {LocalStorageService.instance.setFirstAppRun(false), context.router.replaceNamed('/home')}
+                            ? {
+                                LocalStorageService.instance.setFirstAppRun(false),
+                                context.router.pushNamed('/permissions'),
+                              }
                             : _pageController.nextPage(
                                 duration: const Duration(milliseconds: 300), curve: Curves.linear);
                       },
@@ -88,8 +91,10 @@ class _WelcomePageState extends State<WelcomePage> {
                           color: Colors.blueGrey,
                           decoration: TextDecoration.underline,
                         )),
-                    onPressed: () =>
-                        {LocalStorageService.instance.setFirstAppRun(false), context.router.replaceNamed('/home')})
+                    onPressed: () => {
+                          LocalStorageService.instance.setFirstAppRun(false),
+                          context.router.replaceNamed('/permissions')
+                        })
               ],
             )));
   }

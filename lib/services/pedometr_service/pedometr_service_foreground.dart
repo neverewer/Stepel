@@ -10,20 +10,19 @@ class PedometrServiceForeground {
   factory PedometrServiceForeground() => _instance;
   PedometrServiceForeground._internal();
 
-  final int dayCardioPointsTarget = 40;
+  final int _cardioPointsTarget = 40;
   int initialSteps = 0;
-  final int stepTarget = 8000;
+  final int _stepTarget = 8000;
   FitData _fitData = FitData.zero;
-  final DateTime currentDate = DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now()));
+  DateTime currentDate = DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now()));
+  List<FitData> _weeklyFitData = [];
   final AppDb _db = AppDb();
 
-  Stream<FitData> get fitDataStream => Pedometer.stepCountStream.asBroadcastStream().map((event) {
-        _fitData = _fitData.copyWith(newSteps: event.steps - initialSteps);
-        return _fitData;
-      });
+  Stream<FitData> get fitDataStream => Pedometer.stepCountStream.asBroadcastStream().map((event) => stepCount(event));
 
   Future<void> init() async {
     await getInitialSteps();
+    await getCurrentDate();
     await loadFitData();
   }
 
@@ -36,10 +35,60 @@ class PedometrServiceForeground {
     initialSteps = initSteps;
   }
 
+  Future<void> getCurrentDate() async {
+    var date = await LocalStorageService.instance.getStepDate();
+    date != null
+        ? currentDate = DateTime.parse(date)
+        : LocalStorageService.instance.setStepDate(currentDate.toIso8601String());
+  }
+
   Future<void> loadFitData() async {
-    var steps = await _db.getStepsByDate(currentDate);
-    _fitData = _fitData.copyWith(newSteps: steps.steps);
+    var result = _db.getStepsByDate(currentDate);
+    var steps = await result.getSingleOrNull();
+    if (steps != null) {
+      _fitData = _fitData.copyWith(newSteps: steps.steps);
+    }
+  }
+
+  FitData stepCount(StepCount event) {
+    checkInitialSteps(event);
+    checkCurrentDate(event);
+    _fitData = _fitData.copyWith(newSteps: event.steps - initialSteps);
+    return _fitData;
+  }
+
+  void checkInitialSteps(StepCount event) {
+    if (initialSteps != 0) {
+      return;
+    }
+    initialSteps = event.steps;
+  }
+
+  void checkCurrentDate(StepCount event) {
+    if (currentDate.day == event.timeStamp.day) {
+      return;
+    }
+    initialSteps == event.steps;
   }
 
   FitData getFitData() => _fitData;
+
+  int getStepsTarget() => _stepTarget;
+
+  int getCardioPointsTarget() => _cardioPointsTarget;
+
+  Future<List<List<double>>> getWeeklyData() async {
+    var result = await _db.getWeeklySteps();
+    _weeklyFitData = result.map((step) => FitData(step.steps)).toList();
+    var weeklySteps = _weeklyFitData.map((e) => e.steps.toDouble()).toList();
+    var weeklyCalories = _weeklyFitData.map((e) => e.calories).toList();
+    var weeklyCardioPoints = _weeklyFitData.map((e) => e.cardioPoints.toDouble()).toList();
+    return [weeklySteps, weeklyCardioPoints, weeklyCalories];
+  }
+
+  Future<List<FitData>> loadGeneralFitData() async {
+    var result = await _db.getAllSteps();
+    var list = result.reversed.map((e) => FitData(e.steps, date: e.date)).toList();
+    return list;
+  }
 }

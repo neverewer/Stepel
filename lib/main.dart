@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:stepel/router/router.dart';
-// import 'package:stepel/services/pedometr_service.dart';
-import 'package:stepel/services/pedometr_service/pedometr_service_background.dart';
-import 'package:stepel/services/pedometr_service/pedometr_service_foreground.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  PedometrServiceBackground.init();
-  await PedometrServiceForeground().init();
+  await initializeDateFormatting('ru', null);
   var appRouter = AppRouter();
   await appRouter.init();
   runApp(MainApp(

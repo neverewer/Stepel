@@ -19,17 +19,17 @@ class AppDb extends _$AppDb {
   @override
   int get schemaVersion => 1;
 
-  // Future<List<Step>> getWeeklyStepList() async {
-  //   final weekAgo = DateTime.now().subtract(const Duration(days: 7));
-  //   return await (select(steps)..where((tbl) => tbl.date.isBiggerOrEqualValue(weekAgo))).get();
-  // }
+  Future<List<Step>> getWeeklySteps() async {
+    final weekAgo = DateTime.now().subtract(const Duration(days: 7));
+    return await (select(steps)..where((tbl) => tbl.date.isBiggerOrEqualValue(weekAgo))).get();
+  }
 
   Future<void> createOrUpdateSteps(Step step) async {
     into(steps).insertOnConflictUpdate(step);
   }
 
-  Future<Step> getStepsByDate(DateTime date) async {
-    return await (select(steps)..where((tbl) => tbl.date.equals(date))).getSingle();
+  SingleOrNullSelectable<Step> getStepsByDate(DateTime date) {
+    return (select(steps)..where((tbl) => tbl.date.equals(date)));
   }
 
   Future<List<Step>> getAllSteps() async => await (select(steps).get());

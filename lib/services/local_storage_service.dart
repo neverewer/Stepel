@@ -18,4 +18,7 @@ mixin LocalStorageApi on LocalStorageCache {
   Future<int?> getCurrentSteps() => _$db.then((db) => db.getInt('CURRENTSTEPS'));
   Future<void> setStepDate(String date) => _$db.then((db) => db.setString('STEPDATE', date));
   Future<String?> getStepDate() => _$db.then((db) => db.getString('STEPDATE'));
+  Future<void> setPermissionsGranted(bool permissionsGranted) =>
+      _$db.then((db) => db.setBool('PERMISSIONSGRANTED', permissionsGranted));
+  Future<bool?> getPermissionsGranted() => _$db.then((db) => db.getBool('PERMISSIONSGRANTED'));
 }

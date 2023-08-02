@@ -13,7 +13,7 @@ class PedometrServiceBackground {
 
   // initial Pedometr steps count
   // due to the fact that the pedometer gives the current number of steps, we need to remember the initial number of steps when we first start the application
-  static int initialSteps = 0;
+  static int _initialSteps = 0;
 
   // database
   static final AppDb _db = AppDb();
@@ -33,7 +33,6 @@ class PedometrServiceBackground {
   //function to initialize service in background
   static void init() async {
     //getAllSteps();
-    NotificationService.init();
     final service = FlutterBackgroundService();
     if (await service.isRunning()) {
       return;
@@ -63,7 +62,7 @@ class PedometrServiceBackground {
 
   // function for counting steps
   static void onStepCount(StepCount event) {
-    //setInitialSteps(event);
+    setInitialSteps(event);
     if (event.timeStamp.day == currentDate.day) {
       // if the current day coincides with the date the steps were received, then we save the current steps to database
       saveStepsToDatabase(event);
@@ -84,7 +83,7 @@ class PedometrServiceBackground {
     if (initSteps == null) {
       return;
     }
-    initialSteps = initSteps;
+    _initialSteps = initSteps;
   }
 
   //get current date from SharedPreferences or save current date if not saved
@@ -98,17 +97,17 @@ class PedometrServiceBackground {
   // save initial steps count to SharedPreferences
   // it's need if we don't have saved inital steps count value
   static void setInitialSteps(StepCount event) async {
-    if (initialSteps != 0) {
+    if (_initialSteps != 0) {
       return;
     }
-    initialSteps = event.steps;
-    LocalStorageService.instance.setCurrentSteps(initialSteps);
+    _initialSteps = event.steps;
+    LocalStorageService.instance.setCurrentSteps(_initialSteps);
   }
 
   //update previous steps and save value to SharedPreferences
   static void updateInitialSteps(int preSteps) async {
     LocalStorageService.instance.setCurrentSteps(preSteps);
-    initialSteps = preSteps;
+    _initialSteps = preSteps;
   }
 
   // update current date and save value to SharedPreferences
@@ -120,7 +119,7 @@ class PedometrServiceBackground {
   // save steps count to database
   // the database entry looks like [date - steps count]
   static void saveStepsToDatabase(StepCount event) async {
-    _db.createOrUpdateSteps(Step(date: currentDate, steps: event.steps - initialSteps));
-    NotificationService.showFitNotification(event.steps - initialSteps);
+    _db.createOrUpdateSteps(Step(date: currentDate, steps: event.steps - _initialSteps));
+    NotificationService.showOrUpdateFitNotification(event.steps - _initialSteps);
   }
 }

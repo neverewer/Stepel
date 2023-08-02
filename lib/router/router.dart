@@ -4,20 +4,40 @@ import 'package:stepel/services/local_storage_service.dart';
 
 @AutoRouterConfig()
 class AppRouter extends $AppRouter {
-  bool? firstAppRun;
+  late final bool _firstAppRun;
+  late final bool _permissionsGranted;
 
-  Future init() async {
-    firstAppRun = await LocalStorageService.instance.getFirstAppRun();
-    firstAppRun ??= true;
+  Future<void> init() async {
+    _firstAppRun = await LocalStorageService.instance.getFirstAppRun() ?? true;
+    _permissionsGranted = await LocalStorageService.instance.getPermissionsGranted() ?? false;
   }
 
   @override
-  List<AutoRoute> get routes => firstAppRun!
-      ? [
-          AutoRoute(page: WelcomeRoute.page, path: '/'),
-          AutoRoute(page: HomeRoute.page, path: '/home'),
-        ]
-      : [
-          AutoRoute(page: HomeRoute.page, path: '/'),
-        ];
+  List<AutoRoute> get routes {
+    if (_firstAppRun && !_permissionsGranted) {
+      return [
+        AutoRoute(page: WelcomeRoute.page, path: '/'),
+        AutoRoute(page: MainRoute.page, path: '/main'),
+        AutoRoute(page: PermissionsRoute.page, path: '/permissions'),
+      ];
+    } else if (!_firstAppRun && !_permissionsGranted) {
+      return [
+        AutoRoute(page: MainRoute.page, path: '/main'),
+        AutoRoute(page: PermissionsRoute.page, path: '/'),
+      ];
+    } else if (!_firstAppRun && _permissionsGranted) {
+      return [
+        AutoRoute(page: MainRoute.page, path: '/', children: [
+          AutoRoute(page: HomeRoute.page, path: 'home'),
+          AutoRoute(page: JournalRoute.page, path: 'journal'),
+        ]),
+      ];
+    } else {
+      return [
+        AutoRoute(page: WelcomeRoute.page, path: '/'),
+        AutoRoute(page: MainRoute.page, path: '/main'),
+        AutoRoute(page: PermissionsRoute.page, path: '/permissions'),
+      ];
+    }
+  }
 }
