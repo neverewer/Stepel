@@ -39,63 +39,99 @@ class _WelcomePageState extends State<WelcomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                SizedBox(
-                  height: 550,
-                  child: PageView(
-                    controller: _pageController,
-                    children: const [WelcomeCard1(), WelcomeCard2(), WelcomeCard3(), WelcomeCard4()],
-                    onPageChanged: (pageIndex) {
-                      setState(() {
-                        currentPageIndex = pageIndex;
-                      });
-                    },
-                  ),
+                PageWidget(
+                    pageController: _pageController,
+                    onPageChanged: (index) => setState(() {
+                          currentPageIndex = index;
+                        })),
+                PageIndicator(pageController: _pageController),
+                NextButton(
+                  pageController: _pageController,
+                  currentPageIndex: currentPageIndex,
                 ),
-                SmoothPageIndicator(
-                  controller: _pageController,
-                  count: 4,
-                  effect: ExpandingDotsEffect(
-                      activeDotColor: Colors.deepPurple,
-                      dotColor: Colors.deepPurple.shade100,
-                      dotHeight: 10,
-                      dotWidth: 10),
-                ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                    height: 48.0,
-                    width: 340,
-                    decoration: const BoxDecoration(
-                        gradient: LinearGradient(colors: [Color.fromARGB(255, 2, 173, 102), Colors.blue])),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        currentPageIndex == 3
-                            ? {
-                                LocalStorageService.instance.setFirstAppRun(false),
-                                context.router.pushNamed('/permissions'),
-                              }
-                            : _pageController.nextPage(
-                                duration: const Duration(milliseconds: 300), curve: Curves.linear);
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
-                      child: Text(currentPageIndex == 3 ? 'Start' : 'Next'),
-                    ),
-                  ),
-                ),
-                TextButton(
-                    child: const Text('Skip',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blueGrey,
-                          decoration: TextDecoration.underline,
-                        )),
-                    onPressed: () => {
-                          LocalStorageService.instance.setFirstAppRun(false),
-                          context.router.replaceNamed('/permissions')
-                        })
+                const SkipButton(),
               ],
             )));
+  }
+}
+
+class NextButton extends StatelessWidget {
+  const NextButton({super.key, required this.pageController, required this.currentPageIndex});
+  final PageController pageController;
+  final int currentPageIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        height: 48.0,
+        width: 340,
+        decoration:
+            const BoxDecoration(gradient: LinearGradient(colors: [Color.fromARGB(255, 2, 173, 102), Colors.blue])),
+        child: ElevatedButton(
+          onPressed: () {
+            currentPageIndex == 3
+                ? {
+                    LocalStorageService.instance.setFirstAppRun(false),
+                    context.router.pushNamed('/permissions'),
+                  }
+                : pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.linear);
+          },
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
+          child: Text(currentPageIndex == 3 ? 'Start' : 'Next'),
+        ),
+      ),
+    );
+  }
+}
+
+class SkipButton extends StatelessWidget {
+  const SkipButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+        child: const Text('Skip',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.blueGrey,
+              decoration: TextDecoration.underline,
+            )),
+        onPressed: () =>
+            {LocalStorageService.instance.setFirstAppRun(false), context.router.replaceNamed('/permissions')});
+  }
+}
+
+class PageIndicator extends StatelessWidget {
+  const PageIndicator({super.key, required this.pageController});
+  final PageController pageController;
+
+  @override
+  Widget build(BuildContext context) {
+    return SmoothPageIndicator(
+      controller: pageController,
+      count: 4,
+      effect: ExpandingDotsEffect(
+          activeDotColor: Colors.deepPurple, dotColor: Colors.deepPurple.shade100, dotHeight: 10, dotWidth: 10),
+    );
+  }
+}
+
+class PageWidget extends StatelessWidget {
+  const PageWidget({super.key, required this.pageController, required this.onPageChanged});
+  final PageController pageController;
+  final Function(int) onPageChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 550,
+      child: PageView(
+          controller: pageController,
+          children: const [WelcomeCard1(), WelcomeCard2(), WelcomeCard3(), WelcomeCard4()],
+          onPageChanged: (pageIndex) => onPageChanged),
+    );
   }
 }

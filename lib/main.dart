@@ -1,16 +1,23 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:stepel/repositories/fit_data_repository.dart';
 import 'package:stepel/router/router.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('ru', null);
-  var appRouter = AppRouter();
-  await appRouter.init();
-  runApp(MainApp(
-    appRouter: appRouter,
-  ));
+  await runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await initializeDateFormatting('ru', null);
+    var appRouter = AppRouter();
+    await appRouter.init();
+    runApp(MainApp(appRouter: appRouter));
+  }, (error, stackTrace) {
+    log('app:', error: error, stackTrace: stackTrace);
+  });
 }
 
 class MainApp extends StatelessWidget {
@@ -23,6 +30,9 @@ class MainApp extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.white,
     ));
-    return MaterialApp.router(debugShowCheckedModeBanner: false, routerConfig: appRouter.config());
+    return RepositoryProvider(
+      create: (_) => FitDataRepositoryImp(),
+      child: MaterialApp.router(debugShowCheckedModeBanner: false, routerConfig: appRouter.config()),
+    );
   }
 }

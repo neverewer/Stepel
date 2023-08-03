@@ -28,9 +28,9 @@ class HomePageForm extends StatelessWidget {
                   fitData: state.fitData,
                   stepTarget: state.stepTarget,
                   cardioPointsTarget: state.dayCardioPointsTarget,
-                  weeklySteps: state.weeklyData[0],
-                  weeklyCardioPoints: state.weeklyData[1],
-                  weeklyCalories: state.weeklyData[2],
+                  weeklySteps: state.weeklyData['steps']!,
+                  weeklyCardioPoints: state.weeklyData['cardioPoints']!,
+                  weeklyCalories: state.weeklyData['calories']!,
                 ),
             error: (_) => const SizedBox()));
   }

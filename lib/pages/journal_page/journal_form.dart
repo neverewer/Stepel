@@ -56,6 +56,7 @@ class DataWidget extends StatelessWidget {
             )
           ],
           body: ListView.builder(
+              physics: const BouncingScrollPhysics(),
               itemCount: data.length,
               itemBuilder: ((context, index) => ListItem(
                     date: data[index].dateToString(),

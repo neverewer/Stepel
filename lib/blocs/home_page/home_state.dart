@@ -29,7 +29,7 @@ sealed class HomeState extends _$HomeStateBase {
     required FitData fitData,
     final int dayCardioPointsTarget,
     final int stepTarget,
-    final List<List<double>> weeklyData,
+    final Map<String, List<double>> weeklyData,
     String message,
   }) = HomeState$Successful;
 
@@ -63,20 +63,20 @@ final class HomeState$Successful extends HomeState with _$HomePageState {
   final FitData fitData;
   final int dayCardioPointsTarget;
   final int stepTarget;
-  final List<List<double>> weeklyData;
+  final Map<String, List<double>> weeklyData;
 
   const HomeState$Successful(
       {required this.fitData,
       this.dayCardioPointsTarget = 0,
       this.stepTarget = 0,
-      this.weeklyData = const [],
+      this.weeklyData = const {},
       super.message = 'Successful'});
 
   HomeState$Successful copyWith({
     FitData? fitData,
     int? dayCardioPointsTarget,
     int? stepTarget,
-    List<List<double>>? weeklyData,
+    Map<String, List<double>>? weeklyData,
   }) {
     return HomeState$Successful(
       fitData: fitData ?? this.fitData,

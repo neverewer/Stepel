@@ -57,11 +57,11 @@ class PedometrServiceBackground {
     DartPluginRegistrant.ensureInitialized();
     await getInitialSteps();
     await getCurrentDate();
-    Pedometer.stepCountStream.listen(onStepCount).onError(onStepCountError);
+    Pedometer.stepCountStream.listen((event) => onStepCount(event, service)).onError(onStepCountError);
   }
 
   // function for counting steps
-  static void onStepCount(StepCount event) {
+  static void onStepCount(StepCount event, ServiceInstance service) {
     setInitialSteps(event);
     if (event.timeStamp.day == currentDate.day) {
       // if the current day coincides with the date the steps were received, then we save the current steps to database
@@ -71,6 +71,7 @@ class PedometrServiceBackground {
       updateCurrentDate();
       updateInitialSteps(event.steps);
     }
+    service.invoke('updateSteps', {'steps': event.steps - _initialSteps});
   }
 
   // function to handle error while listening Pedometr.stepCountStream
