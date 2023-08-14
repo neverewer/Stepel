@@ -14,12 +14,15 @@ class MainPage extends StatelessWidget {
         routes: const [
           HomeRoute(),
           JournalRoute(),
+          ProfileRoute(),
         ],
         builder: (context, child, _) {
           final tabsRouter = AutoTabsRouter.of(context);
           return Scaffold(
             body: child,
+            extendBody: true,
             bottomNavigationBar: BottomNavigationBar(
+              backgroundColor: Colors.white.withOpacity(0.9),
               showUnselectedLabels: false,
               selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
               currentIndex: tabsRouter.activeIndex,
@@ -27,6 +30,7 @@ class MainPage extends StatelessWidget {
               items: const [
                 BottomNavigationBarItem(label: 'Главная', icon: Icon(Icons.adjust)),
                 BottomNavigationBarItem(label: 'Журнал', icon: Icon(Icons.wysiwyg)),
+                BottomNavigationBarItem(label: 'Профиль', icon: Icon(Icons.person_outlined)),
               ],
             ),
           );

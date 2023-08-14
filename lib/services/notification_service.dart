@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   static const String _icon = 'flutter_logo';
@@ -15,6 +17,21 @@ class NotificationService {
     playSound: false,
     autoCancel: false,
   );
+
+  static AndroidNotificationDetails scheduleAndroidNotificationDetails = const AndroidNotificationDetails(
+    'daily',
+    'sleep mode',
+    priority: Priority.max,
+    importance: Importance.max,
+    icon: _icon,
+    largeIcon: null,
+    channelShowBadge: true,
+    playSound: true,
+  );
+
+  static NotificationDetails scheduleNotificationDetails =
+      NotificationDetails(android: scheduleAndroidNotificationDetails);
+
   static DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
     requestCriticalPermission: true,
     onDidReceiveLocalNotification: (id, title, body, payload) {},
@@ -32,11 +49,48 @@ class NotificationService {
   static void onDidReceiveBackgroundNotificationRespone(NotificationResponse notificationResponse) {}
 
   static void showOrUpdateFitNotification(int steps) {
-    try {
-      notificationPlugin.show(
-          0, 'Вы сделали $steps шагов', 'Ваша цель на сегодня составляет 8000 шагов', notificationDetails);
-    } catch (e) {
-      print(e);
-    }
+    notificationPlugin.show(
+        0, 'Вы сделали $steps шагов', 'Ваша цель на сегодня составляет 8000 шагов', notificationDetails);
+  }
+
+  static void activateWakeUpNotifications(TimeOfDay time) {
+    notificationPlugin.cancel(1);
+    notificationPlugin.zonedSchedule(
+      1,
+      'Пора просыпаться',
+      '',
+      getScheduleDate(time),
+      scheduleNotificationDetails,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  static void activateTimeToSleepNotifications(TimeOfDay time) {
+    notificationPlugin.cancel(2);
+    notificationPlugin.zonedSchedule(
+      2,
+      'Пора ложиться спать',
+      '',
+      getScheduleDate(time),
+      scheduleNotificationDetails,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  static void deactivateSleepingModeNotifications() {
+    notificationPlugin.cancel(1);
+    notificationPlugin.cancel(2);
+  }
+
+  static tz.TZDateTime getScheduleDate(TimeOfDay time) {
+    final DateTime now = DateTime.now();
+    var scheduleDateTime = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    tz.TZDateTime scheduledDate = tz.TZDateTime.from(scheduleDateTime, tz.local);
+
+    return scheduledDate;
   }
 }

@@ -7,7 +7,7 @@ class JournalCubit extends Cubit<JournalState> {
 
   final FitDataRepositoryImp fitDataRepo;
 
-  void loadFitData() async {
+  void init() async {
     emit(const JournalState.processing(data: null));
     var result = await fitDataRepo.getAllFitData();
     emit(JournalState.successful(data: result));

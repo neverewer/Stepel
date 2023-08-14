@@ -7,6 +7,7 @@ import 'package:stepel/widgets/loading_form.dart';
 import '../../models/fit_data.dart';
 import '../../widgets/cardio_label.dart';
 import '../../widgets/circle_double_chart.dart';
+import '../../widgets/page_title.dart';
 import '../../widgets/statistic_box.dart';
 import '../../widgets/steps_label.dart';
 
@@ -19,7 +20,13 @@ class JournalForm extends StatelessWidget {
         builder: ((context, state) => state.map(
             idle: (_) => const LoadingForm(),
             processing: (_) => const LoadingForm(),
-            successful: (state) => DataWidget(data: state.data!),
+            successful: (state) {
+              if (state.hasData) {
+                return DataWidget(data: state.data!);
+              } else {
+                return const SizedBox();
+              }
+            },
             error: (_) => const SizedBox())));
   }
 }
@@ -44,12 +51,7 @@ class DataWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Журнал',
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontSize: 18),
-                      )
-                    ],
+                    children: [PageTitle(title: 'Журнал')],
                   )),
               expandedHeight: 120,
               pinned: true,
@@ -81,7 +83,7 @@ class AppBarActions extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
-                onPressed: () => context.read<JournalCubit>().loadFitData(),
+                onPressed: () => context.read<JournalCubit>().init(),
                 icon: const Icon(
                   Icons.autorenew_rounded,
                   size: 24,
@@ -124,8 +126,8 @@ class ListItem extends StatelessWidget {
               child: Text(date.toString(), style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 16))),
           const SizedBox(height: 10),
           Divider(
-            color: Colors.grey.withOpacity(0.8),
-            height: 1.2,
+            color: Colors.grey.shade300,
+            thickness: 1.5,
           ),
           const SizedBox(
             height: 10,

@@ -111,10 +111,8 @@ class ConfirmButton extends StatelessWidget {
       onPressed: () async {
         var permissionsGranted = await PermissionsService.checkPermissions();
         LocalStorageService.instance.setPermissionsGranted(permissionsGranted);
-        if (permissionsGranted) {
-          if (context.mounted) {
-            context.router.replaceNamed('/main');
-          }
+        if (permissionsGranted && context.mounted) {
+          context.router.replaceNamed('/main');
         }
       },
       style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.blue.shade800)),

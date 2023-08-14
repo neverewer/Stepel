@@ -21,11 +21,6 @@ class _WelcomePageState extends State<WelcomePage> {
   int currentPageIndex = 0;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
@@ -76,10 +71,12 @@ class NextButton extends StatelessWidget {
                     LocalStorageService.instance.setFirstAppRun(false),
                     context.router.pushNamed('/permissions'),
                   }
-                : pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.linear);
+                : {
+                    pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.linear),
+                  };
           },
           style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
-          child: Text(currentPageIndex == 3 ? 'Start' : 'Next'),
+          child: Text(currentPageIndex == 3 ? 'Начать' : 'Далее'),
         ),
       ),
     );
@@ -92,15 +89,17 @@ class SkipButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-        child: const Text('Skip',
+        child: const Text('Пропустить',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.blueGrey,
               decoration: TextDecoration.underline,
             )),
-        onPressed: () =>
-            {LocalStorageService.instance.setFirstAppRun(false), context.router.replaceNamed('/permissions')});
+        onPressed: () => {
+              LocalStorageService.instance.setFirstAppRun(false),
+              context.router.replaceNamed('/permissions'),
+            });
   }
 }
 
@@ -122,7 +121,7 @@ class PageIndicator extends StatelessWidget {
 class PageWidget extends StatelessWidget {
   const PageWidget({super.key, required this.pageController, required this.onPageChanged});
   final PageController pageController;
-  final Function(int) onPageChanged;
+  final void Function(int) onPageChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +130,9 @@ class PageWidget extends StatelessWidget {
       child: PageView(
           controller: pageController,
           children: const [WelcomeCard1(), WelcomeCard2(), WelcomeCard3(), WelcomeCard4()],
-          onPageChanged: (pageIndex) => onPageChanged),
+          onPageChanged: (pageIndex) {
+            onPageChanged(pageIndex);
+          }),
     );
   }
 }

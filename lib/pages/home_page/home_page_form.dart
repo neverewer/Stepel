@@ -204,19 +204,17 @@ class TrendsBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.only(top: 10, left: 2, right: 2),
+        padding: const EdgeInsets.only(top: 15, left: 2, right: 2),
         child: SizedBox(
             width: double.infinity,
             height: 130,
             child: DecoratedBox(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                  borderRadius: const BorderRadius.all(Radius.circular(16)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey,
-                      blurRadius: 0.1,
-                    )
+                        color: Colors.grey.shade200, blurRadius: 0.2, spreadRadius: 1, blurStyle: BlurStyle.normal)
                   ]),
               child: Padding(
                   padding: const EdgeInsets.all(14),
@@ -268,18 +266,19 @@ class RecomendationBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.only(top: 10, left: 2, right: 2),
+        padding: const EdgeInsets.only(top: 15, left: 2, right: 2),
         child: SizedBox(
           width: double.infinity,
           height: 130,
           child: DecoratedBox(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                  borderRadius: const BorderRadius.all(Radius.circular(16)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey,
-                      blurRadius: 0.1,
+                      color: Colors.grey.shade200,
+                      blurRadius: 2,
+                      spreadRadius: 1,
                     )
                   ]),
               child: Padding(

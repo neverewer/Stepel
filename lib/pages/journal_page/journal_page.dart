@@ -13,7 +13,7 @@ class JournalPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => JournalCubit(fitDataRepo: context.read<FitDataRepositoryImp>())..loadFitData(),
+      create: (context) => JournalCubit(fitDataRepo: context.read<FitDataRepositoryImp>())..init(),
       child: const JournalForm(),
     );
   }
