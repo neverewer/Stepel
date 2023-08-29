@@ -1,6 +1,4 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:stepel/router/router.gr.dart';
-import 'package:stepel/services/local_storage_service.dart';
+import 'package:stepel/imports.dart';
 
 @AutoRouterConfig()
 class AppRouter extends $AppRouter {

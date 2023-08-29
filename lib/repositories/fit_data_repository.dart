@@ -1,8 +1,6 @@
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:intl/intl.dart';
-
-import '../db/database.dart';
-import '../models/fit_data.dart';
+import 'package:stepel/db/database.dart';
+import 'package:stepel/imports.dart';
 
 abstract class FitDataRepository {
   Stream<FitData> get fitDataStream;
@@ -38,10 +36,19 @@ class FitDataRepositoryImp implements FitDataRepository {
   @override
   Future<Map<String, List<double>>> getWeeklyData() async {
     var result = await _db.getWeeklySteps();
-    var weeklyFitData = result.map((step) => FitData(step.steps)).toList();
-    var weeklySteps = weeklyFitData.map((e) => e.steps.toDouble()).toList();
-    var weeklyCalories = weeklyFitData.map((e) => e.calories).toList();
-    var weeklyCardioPoints = weeklyFitData.map((e) => e.cardioPoints.toDouble()).toList();
+    List<double> weeklySteps = [];
+    List<double> weeklyCalories = [];
+    List<double> weeklyCardioPoints = [];
+    if (result.isEmpty) {
+      weeklySteps = getEmptyList();
+      weeklyCalories = getEmptyList();
+      weeklyCardioPoints = getEmptyList();
+    } else {
+      var weeklyFitData = result.map((step) => FitData(step.steps)).toList();
+      weeklySteps = weeklyFitData.map((e) => e.steps.toDouble()).toList();
+      weeklyCalories = weeklyFitData.map((e) => e.calories).toList();
+      weeklyCardioPoints = weeklyFitData.map((e) => e.cardioPoints.toDouble()).toList();
+    }
     return {'steps': weeklySteps, 'cardioPoints': weeklyCardioPoints, 'calories': weeklyCalories};
   }
 
@@ -49,6 +56,14 @@ class FitDataRepositoryImp implements FitDataRepository {
   Future<List<FitData>> getAllFitData() async {
     var result = await _db.getAllSteps();
     var list = result.reversed.map((e) => FitData(e.steps, date: e.date)).toList();
+
+    if (list.isEmpty) {
+      list.add(FitData(0, date: currentDate));
+    }
     return list;
+  }
+
+  List<double> getEmptyList() {
+    return [0, 0, 0, 0, 0, 0, 0];
   }
 }

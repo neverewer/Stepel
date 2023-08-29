@@ -1,9 +1,6 @@
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_file.dart';
-import 'package:intl/intl.dart';
-
 import 'dart:math';
+
+import 'package:stepel/imports.dart';
 
 class WeeklyBarChart extends StatefulWidget {
   const WeeklyBarChart({super.key, required this.data, required this.barColor});
@@ -64,10 +61,6 @@ Widget getTitles(double value, TitleMeta meta) {
     fontWeight: FontWeight.w400,
     fontSize: 12,
   );
-
-  // var formatter = DateFormat('EEEE');
-
-  // var text = formatter.format(DateTime.now().subtract(Duration(days: 7 - (value.toInt() + 1))))[0];
 
   var date = DateTime.now().subtract(Duration(days: 7 - (value.toInt() + 1)));
   var weekDay = date.weekday;

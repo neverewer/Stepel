@@ -1,12 +1,6 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:numberpicker/numberpicker.dart';
 import 'package:stepel/blocs/profile_page/profile_cubit.dart';
 import 'package:stepel/blocs/profile_page/profile_state.dart';
-import 'package:stepel/widgets/loading_form.dart';
-
-import '../../widgets/page_title.dart';
+import 'package:stepel/imports.dart';
 
 class ProfileForm extends StatelessWidget {
   const ProfileForm({super.key});

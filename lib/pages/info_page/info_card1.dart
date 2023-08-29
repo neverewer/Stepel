@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:stepel/imports.dart';
 
 class InfoCard1 extends StatelessWidget {
   const InfoCard1({super.key});

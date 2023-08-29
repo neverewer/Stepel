@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:stepel/imports.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
@@ -48,9 +47,10 @@ class NotificationService {
   @pragma('vm:entry-point')
   static void onDidReceiveBackgroundNotificationRespone(NotificationResponse notificationResponse) {}
 
-  static void showOrUpdateFitNotification(int steps) {
+  static void showOrUpdateFitNotification(int steps, int stepCount) {
+    var stepsString = formatSteps(steps);
     notificationPlugin.show(
-        0, 'Вы сделали $steps шагов', 'Ваша цель на сегодня составляет 8000 шагов', notificationDetails);
+        0, 'Вы сделали $stepsString', 'Ваша цель на сегодня составляет $stepCount шагов', notificationDetails);
   }
 
   static void activateWakeUpNotifications(TimeOfDay time) {
@@ -92,5 +92,22 @@ class NotificationService {
     tz.TZDateTime scheduledDate = tz.TZDateTime.from(scheduleDateTime, tz.local);
 
     return scheduledDate;
+  }
+
+  static String formatSteps(int steps) {
+    if (steps == 1) {
+      return '1 шаг';
+    }
+
+    String suffix;
+    if (steps % 10 == 1 && steps % 100 != 11) {
+      suffix = 'шаг';
+    } else if (steps % 10 >= 2 && steps % 10 <= 4 && (steps % 100 < 10 || steps % 100 >= 20)) {
+      suffix = 'шага';
+    } else {
+      suffix = 'шагов';
+    }
+
+    return '$steps $suffix';
   }
 }

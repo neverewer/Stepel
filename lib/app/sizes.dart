@@ -1,0 +1,3 @@
+class Sizes {
+  Sizes._();
+}

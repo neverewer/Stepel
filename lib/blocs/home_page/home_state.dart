@@ -1,6 +1,4 @@
-import 'package:meta/meta.dart';
-
-import '../../models/fit_data.dart';
+import 'package:stepel/imports.dart';
 
 /// {@template home_page_state_placeholder}
 /// Entity placeholder for HomePageState

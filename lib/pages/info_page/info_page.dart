@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:stepel/imports.dart';
 import 'package:stepel/pages/info_page/Info_card2.dart';
 import 'package:stepel/pages/info_page/info_card1.dart';
 

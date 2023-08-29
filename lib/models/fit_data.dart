@@ -1,5 +1,5 @@
 import 'package:intl/intl.dart';
-import 'package:meta/meta.dart';
+import 'package:stepel/imports.dart';
 
 @immutable
 final class FitData implements Comparable<FitData> {

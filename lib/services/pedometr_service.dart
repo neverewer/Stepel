@@ -42,10 +42,6 @@ class PedometrService {
   static int preStepCount = 0;
   static int stepTarget = 8000;
   static final AppDb _db = AppDb();
-  // static final FitData _fitData = FitData();
-
-  // static Stream<FitData> get fitDataStream =>
-  //     Pedometer.stepCountStream.asBroadcastStream().map((event) => _fitData..updateSteps(event.steps - preStepCount));
 
   static Future<void> initServiceInBackground() async {
     if (await checkPermissions() == false) {

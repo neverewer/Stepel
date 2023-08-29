@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:stepel/imports.dart';
 
 class StatisticBox extends StatelessWidget {
   const StatisticBox(
@@ -19,6 +19,7 @@ class StatisticBox extends StatelessWidget {
           children: [
             Text(
               value,
+              textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: valueFontSize ?? 19, color: valueColor ?? Colors.blue, fontWeight: FontWeight.w700),
             ),
@@ -27,6 +28,7 @@ class StatisticBox extends StatelessWidget {
             ),
             Text(
               label,
+              textAlign: TextAlign.center,
               style: TextStyle(fontSize: labelFontSize ?? 14, fontWeight: FontWeight.w500),
             ),
           ],

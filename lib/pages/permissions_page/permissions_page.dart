@@ -1,8 +1,4 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:stepel/services/local_storage_service.dart';
-import 'package:stepel/services/permissions_service.dart';
+import 'package:stepel/imports.dart';
 
 @RoutePage()
 class PermissionsPage extends StatelessWidget {

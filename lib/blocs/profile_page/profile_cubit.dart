@@ -1,9 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stepel/blocs/profile_page/profile_state.dart';
-import 'package:stepel/services/notification_service.dart';
-
-import '../../repositories/profile_data_repository.dart';
+import 'package:stepel/imports.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
   ProfileCubit({required this.profileDataRepo}) : super(const ProfileState.idle());

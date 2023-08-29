@@ -1,4 +1,4 @@
-import 'package:permission_handler/permission_handler.dart';
+import 'package:stepel/imports.dart';
 
 class PermissionsService {
   static Future<bool> checkPermissions() async {

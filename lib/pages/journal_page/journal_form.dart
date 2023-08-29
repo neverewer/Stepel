@@ -1,15 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:stepel/imports.dart';
 import 'package:stepel/blocs/journal_page/journal_cubit.dart';
 import 'package:stepel/blocs/journal_page/journal_state.dart';
-import 'package:stepel/widgets/loading_form.dart';
-
-import '../../models/fit_data.dart';
-import '../../widgets/cardio_label.dart';
-import '../../widgets/circle_double_chart.dart';
-import '../../widgets/page_title.dart';
-import '../../widgets/statistic_box.dart';
-import '../../widgets/steps_label.dart';
 
 class JournalForm extends StatelessWidget {
   const JournalForm({super.key});
@@ -22,9 +13,11 @@ class JournalForm extends StatelessWidget {
             processing: (_) => const LoadingForm(),
             successful: (state) {
               if (state.hasData) {
-                return DataWidget(data: state.data!);
+                return DataWidget(data: state.data);
               } else {
-                return const SizedBox();
+                return const Center(
+                  child: Text('Нет данных'),
+                );
               }
             },
             error: (_) => const SizedBox())));

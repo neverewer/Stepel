@@ -1,4 +1,4 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stepel/imports.dart';
 
 class LocalStorageService with LocalStorageCache, LocalStorageApi {
   static final LocalStorageService _$instance = LocalStorageService._();

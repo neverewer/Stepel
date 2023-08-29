@@ -1,12 +1,7 @@
 import 'dart:ui';
-
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:intl/intl.dart';
-import 'package:pedometer/pedometer.dart';
-import 'package:stepel/services/notification_service.dart';
-
-import '../../db/database.dart';
-import '../local_storage_service.dart';
+import 'package:stepel/db/database.dart' as db;
+import 'package:stepel/imports.dart';
 
 class PedometrServiceBackground {
   //service to show notifications
@@ -15,8 +10,14 @@ class PedometrServiceBackground {
   // due to the fact that the pedometer gives the current number of steps, we need to remember the initial number of steps when we first start the application
   static int _initialSteps = 0;
 
+  static int _stepTarget = 0;
+
+  static int _steps = 0;
+
+  static final LocalStorageService _localStorageService = LocalStorageService.instance;
+
   // database
-  static final AppDb _db = AppDb();
+  static final db.AppDb _db = db.AppDb();
 
   //current date in the format yyyy-mm-dd
   // this format is needed to remove the time from the date in order to correctly update the steps in the database
@@ -55,8 +56,16 @@ class PedometrServiceBackground {
   @pragma('vm:entry-point')
   static Future<void> onStart(ServiceInstance service) async {
     DartPluginRegistrant.ensureInitialized();
+    var stepsTar = await _localStorageService.getStepsTarget() ?? 8000;
+    _stepTarget = stepsTar;
     await getInitialSteps();
     await getCurrentDate();
+    service.on('ChangeStepTarget').listen((event) {
+      if (event == null) {
+        return;
+      }
+      NotificationService.showOrUpdateFitNotification(_steps, event['stepTarget']);
+    });
     Pedometer.stepCountStream.listen((event) => onStepCount(event, service)).onError(onStepCountError);
   }
 
@@ -79,7 +88,7 @@ class PedometrServiceBackground {
 
   //get initial steps from SharedPreferences
   static Future<void> getInitialSteps() async {
-    var initSteps = await LocalStorageService.instance.getCurrentSteps();
+    var initSteps = await _localStorageService.getCurrentSteps();
     //if initial steps have not been saved in SharedPreferences, we exit the function
     if (initSteps == null) {
       return;
@@ -89,10 +98,8 @@ class PedometrServiceBackground {
 
   //get current date from SharedPreferences or save current date if not saved
   static Future<void> getCurrentDate() async {
-    var date = await LocalStorageService.instance.getStepDate();
-    date != null
-        ? currentDate = DateTime.parse(date)
-        : LocalStorageService.instance.setStepDate(currentDate.toIso8601String());
+    var date = await _localStorageService.getStepDate();
+    date != null ? currentDate = DateTime.parse(date) : _localStorageService.setStepDate(currentDate.toIso8601String());
   }
 
   // save initial steps count to SharedPreferences
@@ -102,25 +109,26 @@ class PedometrServiceBackground {
       return;
     }
     _initialSteps = event.steps;
-    LocalStorageService.instance.setCurrentSteps(_initialSteps);
+    _localStorageService.setCurrentSteps(_initialSteps);
   }
 
   //update previous steps and save value to SharedPreferences
   static void updateInitialSteps(int preSteps) async {
-    LocalStorageService.instance.setCurrentSteps(preSteps);
+    _localStorageService.setCurrentSteps(preSteps);
     _initialSteps = preSteps;
   }
 
   // update current date and save value to SharedPreferences
   static void updateCurrentDate() async {
     currentDate = DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now()));
-    LocalStorageService.instance.setStepDate(currentDate.toIso8601String());
+    _localStorageService.setStepDate(currentDate.toIso8601String());
   }
 
   // save steps count to database
   // the database entry looks like [date - steps count]
   static void saveStepsToDatabase(StepCount event) async {
-    _db.createOrUpdateSteps(Step(date: currentDate, steps: event.steps - _initialSteps));
-    NotificationService.showOrUpdateFitNotification(event.steps - _initialSteps);
+    _steps = event.steps - _initialSteps;
+    _db.createOrUpdateSteps(db.Step(date: currentDate, steps: _steps));
+    NotificationService.showOrUpdateFitNotification(event.steps - _initialSteps, _stepTarget);
   }
 }

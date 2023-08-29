@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:stepel/imports.dart';
 
 class PageTitle extends StatelessWidget {
   const PageTitle({super.key, required this.title, this.titleFontSize});

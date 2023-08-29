@@ -1,6 +1,4 @@
-import 'package:meta/meta.dart';
-
-import '../../models/fit_data.dart';
+import 'package:stepel/imports.dart';
 
 /// {@template journal_state_placeholder}
 /// Entity placeholder for JournalState
@@ -14,28 +12,28 @@ sealed class JournalState extends _$JournalStateBase {
   /// Idling state
   /// {@macro journal_state}
   const factory JournalState.idle({
-    required JournalEntity? data,
+    required JournalEntity data,
     String message,
   }) = JournalState$Idle;
 
   /// Processing
   /// {@macro journal_state}
   const factory JournalState.processing({
-    required JournalEntity? data,
+    required JournalEntity data,
     String message,
   }) = JournalState$Processing;
 
   /// Successful
   /// {@macro journal_state}
   const factory JournalState.successful({
-    required JournalEntity? data,
+    required JournalEntity data,
     String message,
   }) = JournalState$Successful;
 
   /// An error has occurred
   /// {@macro journal_state}
   const factory JournalState.error({
-    required JournalEntity? data,
+    required JournalEntity data,
     String message,
   }) = JournalState$Error;
 
@@ -85,14 +83,14 @@ abstract base class _$JournalStateBase {
 
   /// Data entity payload.
   @nonVirtual
-  final JournalEntity? data;
+  final JournalEntity data;
 
   /// Message or state description.
   @nonVirtual
   final String message;
 
   /// Has data?
-  bool get hasData => data != null;
+  bool get hasData => data.isNotEmpty;
 
   /// If an error has occurred?
   bool get hasError => maybeMap<bool>(orElse: () => false, error: (_) => true);

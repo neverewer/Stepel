@@ -1,19 +1,10 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:stepel/widgets/loading_form.dart';
-
-import '../../blocs/home_page/home_cubit.dart';
-import '../../blocs/home_page/home_state.dart';
-import '../../models/fit_data.dart';
-import '../../widgets/bar_chart.dart';
-import '../../widgets/cardio_label.dart';
-import '../../widgets/circle_double_chart.dart';
-import '../../widgets/statistic_box.dart';
-import '../../widgets/steps_label.dart';
-import '../info_page/info_page.dart';
+import 'package:stepel/imports.dart';
+import 'package:stepel/blocs/home_page/home_cubit.dart';
+import 'package:stepel/blocs/home_page/home_state.dart';
+import 'package:stepel/pages/info_page/info_page.dart';
+import 'package:stepel/widgets/weekly_bar_chart.dart';
 
 class HomePageForm extends StatelessWidget {
   const HomePageForm({super.key});

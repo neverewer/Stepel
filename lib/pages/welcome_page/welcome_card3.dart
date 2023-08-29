@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:stepel/imports.dart';
 
 class WelcomeCard3 extends StatelessWidget {
   const WelcomeCard3({super.key});

@@ -1,13 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stepel/blocs/home_page/home_state.dart';
-import 'package:stepel/models/profile_data_update_event.dart';
-import 'package:stepel/repositories/fit_data_repository.dart';
-import 'package:stepel/repositories/profile_data_repository.dart';
-
-import '../../services/notification_service.dart';
-import '../../services/pedometr_service/pedometr_service_background.dart';
+import 'package:stepel/imports.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   HomeCubit({required this.fitDataRepo, required this.profileDataRepo}) : super(const HomeState.idle());
